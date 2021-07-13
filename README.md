@@ -10,3 +10,10 @@ header. If S3 signature verification passes, it will return
 Cloudflare will serve the file from cache (Or it will retrieve from the origin and cache it).
 
 This approach will not work if the Range header is part of the signature.
+
+When HEAD request is issued, for certain extensions Cloudflare makes GET request to origin instead.
+But this [breaks s3v4 signature](https://community.cloudflare.com/t/how-cloudflare-handle-head-request/238093),
+since request method is part of the signature. This worker also tries to remedy this by
+rewriting pathname for requests and replacing `.` with `%2e`. This bypasses Cloudflare
+extension handling logic, path is threated as a dynamic page and request to origin goes through
+properly.

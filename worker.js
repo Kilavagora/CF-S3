@@ -1,4 +1,6 @@
 async function handleRequest(request) {
+  const url = new URL(request.url);
+
   let cf = {
     cacheTtl: -1,
     cacheEverything: false,
@@ -22,8 +24,6 @@ async function handleRequest(request) {
       return checkResponse;
     }
 
-    const url = new URL(request.url);
-
     cf = {
       cacheTtl: 2419200,
       cacheEverything: true,
@@ -31,7 +31,9 @@ async function handleRequest(request) {
     };
   }
 
-  const passThroughRequest = new Request(request.url, request);
+  const href = request.method === "HEAD" ? `${url.protocol}//${url.hostname}${url.pathname.replace(/\./g, "%2e")}${url.search}` : request.url;
+
+  const passThroughRequest = new Request(href, request);
 
   const response = await fetch(passThroughRequest, {
     method: request.method,
